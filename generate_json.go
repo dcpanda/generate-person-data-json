@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/brianvoe/gofakeit/v7"
+	"math"
 	"os"
+	"time"
 )
 
 type Person struct {
@@ -14,7 +17,7 @@ type Person struct {
 	AddressLine1 string `json:"address_line_1"`
 	AddressLine2 string `json:"address_line_2"`
 	City         string `json:"city"`
-	State        string `json:"state"`
+	State        string `json:"state_code"`
 	ZipCode      string `json:"zip_code"`
 	Phone        string `json:"phone"`
 	Email        string `json:"email"`
@@ -22,6 +25,15 @@ type Person struct {
 	Age          int    `json:"age"`
 }
 
+func CalculateAge(birthday string) int {
+	birthDate, err := time.Parse("2006-01-02", birthday)
+	if err != nil {
+		fmt.Printf("Error parsing birthday: %s\n", err)
+		os.Exit(1)
+	}
+	age := math.Ceil(time.Since(birthDate).Hours() / 24 / 365)
+	return int(age)
+}
 func main() {
 	numRecords := flag.Int("n", 1, "Number of fake records to generate")
 	outputFilename := flag.String("o", "fake_pii_data.json", "Output filename for the JSON data")
@@ -31,16 +43,22 @@ func main() {
 
 	var personRecords []Person
 	for i := 0; i < *numRecords; i++ {
+		gofakeit.Seed(0)
+		address := gofakeit.Address()
+		birthdate := gofakeit.DateRange(time.Now().AddDate(-100, 0, 0), time.Now()).Format("2006-01-02")
 		person := Person{
-			FirstName:    "John",
-			LastName:     "Doe",
-			Gender:       "Male",
-			AddressLine1: "123 Main St",
-			AddressLine2: "Apt 1",
-			City:         "New York",
-			State:        "NY",
-			ZipCode:      "10001",
-			Phone:        "123-456-7890",
+			FirstName:    gofakeit.FirstName(),
+			LastName:     gofakeit.LastName(),
+			Gender:       gofakeit.Gender(),
+			AddressLine1: address.Street,
+			AddressLine2: "",
+			City:         address.City,
+			State:        gofakeit.StateAbr(),
+			ZipCode:      address.Zip,
+			Phone:        gofakeit.Phone(),
+			Email:        gofakeit.Email(),
+			Birthday:     birthdate,
+			Age:          CalculateAge(birthdate),
 		}
 		personRecords = append(personRecords, person)
 	}
