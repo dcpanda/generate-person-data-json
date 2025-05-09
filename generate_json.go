@@ -35,7 +35,7 @@ func CalculateAge(birthday string) int {
 	return int(age)
 }
 func main() {
-	numRecords := flag.Int("n", 1, "Number of fake records to generate")
+	numRecords := flag.Int("n", 100, "Number of fake records to generate")
 	outputFilename := flag.String("o", "fake_pii_data.json", "Output filename for the JSON data")
 
 	flag.Parse()
