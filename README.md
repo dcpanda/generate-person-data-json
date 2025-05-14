@@ -14,6 +14,11 @@ go get github.com/brianvoe/gofakeit/v7
 go get github.com/gin-gonic/gin
 ```
 
+3. Install `golangci-lint` for linting support. See the install [link](https://golangci-lint.run/welcome/install/#local-installation). After install check the version.
+```bash
+golangci-lint --version
+```
+
 ## Running the Program
 1. Run the program with optional parameters `-n` for number of records to generate. Use `-o` to overwrite the default file name.
 ```bash
