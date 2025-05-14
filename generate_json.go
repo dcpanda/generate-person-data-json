@@ -1,79 +1,61 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/brianvoe/gofakeit/v7"
-	"math"
 	"os"
-	"time"
+
+	"github.com/dcpanda/generate-person-data-json/pkg/api"
+	"github.com/dcpanda/generate-person-data-json/pkg/person"
 )
 
-type Person struct {
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`
-	Gender       string `json:"gender"`
-	AddressLine1 string `json:"address_line_1"`
-	AddressLine2 string `json:"address_line_2"`
-	City         string `json:"city"`
-	State        string `json:"state_code"`
-	ZipCode      string `json:"zip_code"`
-	Phone        string `json:"phone"`
-	Email        string `json:"email"`
-	Birthday     string `json:"birthday"`
-	Age          int    `json:"age"`
-}
-
-func CalculateAge(birthday string) int {
-	birthDate, err := time.Parse("2006-01-02", birthday)
-	if err != nil {
-		fmt.Printf("Error parsing birthday: %s\n", err)
-		os.Exit(1)
-	}
-	age := math.Ceil(time.Since(birthDate).Hours() / 24 / 365)
-	return int(age)
-}
 func main() {
+	// Define command-line flags
 	numRecords := flag.Int("n", 100, "Number of fake records to generate")
 	outputFilename := flag.String("o", "fake_pii_data.json", "Output filename for the JSON data")
+	serverMode := flag.Bool("server", false, "Run as HTTP server")
+	port := flag.String("port", ":8080", "Port for HTTP server")
 
 	flag.Parse()
-	fmt.Printf("Generating %d fake records into %s...\n", *numRecords, *outputFilename)
 
-	var personRecords []Person
-	for i := 0; i < *numRecords; i++ {
-		gofakeit.Seed(0)
-		address := gofakeit.Address()
-		birthdate := gofakeit.DateRange(time.Now().AddDate(-100, 0, 0), time.Now()).Format("2006-01-02")
-		person := Person{
-			FirstName:    gofakeit.FirstName(),
-			LastName:     gofakeit.LastName(),
-			Gender:       gofakeit.Gender(),
-			AddressLine1: address.Street,
-			AddressLine2: "",
-			City:         address.City,
-			State:        gofakeit.StateAbr(),
-			ZipCode:      address.Zip,
-			Phone:        gofakeit.Phone(),
-			Email:        gofakeit.Email(),
-			Birthday:     birthdate,
-			Age:          CalculateAge(birthdate),
+	// Run in server mode if specified
+	if *serverMode {
+		fmt.Printf("Starting HTTP server on %s...\n", *port)
+		fmt.Println("API endpoints:")
+		fmt.Println("  GET /health - Health check")
+		fmt.Println("  GET /api/persons?n=<number> - Generate person data (default n=10)")
+
+		err := api.StartServer(*port)
+		if err != nil {
+			fmt.Printf("Error starting server: %s\n", err)
+			os.Exit(1)
 		}
-		personRecords = append(personRecords, person)
+		return
 	}
 
-	jsonData, err := json.MarshalIndent(personRecords, "", "  ")
+	// Otherwise, run in CLI mode (backward compatibility)
+	fmt.Printf("Generating %d fake records into %s...\n", *numRecords, *outputFilename)
+
+	// Generate person records
+	personRecords, err := person.GeneratePersonRecords(*numRecords)
 	if err != nil {
-		fmt.Printf("Error Marshalling JSON: %s\n", err)
+		fmt.Printf("Error generating person records: %s\n", err)
 		os.Exit(1)
 	}
 
+	// Convert to JSON
+	jsonData, err := person.MarshalToJSON(personRecords)
+	if err != nil {
+		fmt.Printf("Error marshalling JSON: %s\n", err)
+		os.Exit(1)
+	}
+
+	// Write to file
 	err = os.WriteFile(*outputFilename, jsonData, 0644)
 	if err != nil {
 		fmt.Printf("Error writing JSON to file: %s\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Printf("Successfully generated %d records and saved to %s \n", *numRecords, *outputFilename)
+	fmt.Printf("Successfully generated %d records and saved to %s\n", *numRecords, *outputFilename)
 }

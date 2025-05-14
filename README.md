@@ -2,11 +2,16 @@
 Generate Random Person Data with JSON file for Testing. 
 This makes the use of `gofakeit` random fake data generator. I find this better and with constant updates in compare to `go-randomdata`. 
 
-## Dependency
+## Dependencies
 
-1. Install the `gofakeit`.
+1. Install the `gofakeit` package for generating fake data:
 ```bash 
-go get github.com/brianvoe/gofakeit/v7`
+go get github.com/brianvoe/gofakeit/v7
+```
+
+2. Install the `gin` package for HTTP server functionality:
+```bash
+go get github.com/gin-gonic/gin
 ```
 
 ## Running the Program
@@ -37,7 +42,38 @@ go build generate_json.go
 ./generate_json -n 100000 -o large_fake_data.json 
 ```
 
+## HTTP Server Mode
+The program can also be run as an HTTP server that exposes the person data generation functionality via a REST API.
+
+1. Run the program in server mode:
+```bash
+go run generate_json.go -server
+```
+
+2. By default, the server runs on port 8080. You can specify a different port:
+```bash
+go run generate_json.go -server -port :3000
+```
+
+3. Available API endpoints:
+   - `GET /health` - Health check endpoint that returns a status of "ok"
+   - `GET /api/persons` - Generate and return person data as JSON
+     - Query parameter: `n` - Number of records to generate (default: 10)
+     - Example: `GET /api/persons?n=50` - Generate 50 person records
+
+4. Example of using the API with curl:
+```bash
+# Health check
+curl http://localhost:8080/health
+
+# Generate 20 person records
+curl http://localhost:8080/api/persons?n=20
+```
+
 ## TODO
-- [ ] Refactor the code and see if we can make use of some other features of `gofakeit`
-- [ ] Go `struct` is powerful and can include additional tags to reduce the boilerplate codes.
+- [x] Refactor the code and see if we can make use of some other features of `gofakeit`
+- [x] Go `struct` is powerful and can include additional tags to reduce the boilerplate codes.
 - [ ] Add Unit Testing 
+- [ ] Add more API endpoints for specific data generation needs
+- [ ] Implement rate limiting for the API
+- [ ] Add authentication for the API
