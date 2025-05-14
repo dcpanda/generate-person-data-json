@@ -8,7 +8,10 @@ This makes the use of `gofakeit` random fake data generator. I find this better 
 ```bash 
 go get github.com/brianvoe/gofakeit/v7`
 ```
-
+2. Install `golangci-lint` for linting support. See the install [link](https://golangci-lint.run/welcome/install/#local-installation). After install check the version.
+```bash
+golangci-lint --version
+```
 ## Running the Program
 1. Run the program with optional parameters `-n` for number of records to generate. Use `-o` to overwrite the default file name.
 ```bash
@@ -36,6 +39,9 @@ go build generate_json.go
 ```bash
 ./generate_json -n 100000 -o large_fake_data.json 
 ```
+
+## Added Makefile
+1. See the `Makefile` for all supported commands
 
 ## TODO
 - [ ] Refactor the code and see if we can make use of some other features of `gofakeit`
