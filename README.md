@@ -90,7 +90,7 @@ make server
 make load-test
 ```
 
-For more detailed information about the load testing setup, scenarios, and how to interpret results, see the [Load Testing README](Load_Test_README.md).
+For more detailed information about the load testing setup, scenarios, and how to interpret results, see the [Load Testing README](LOADTEST_README.md).
 
 ## TODO
 - [x] Refactor the code and see if we can make use of some other features of `gofakeit`
