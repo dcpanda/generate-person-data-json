@@ -43,3 +43,11 @@ setup:
 init:
 	 setup
 
+# Load testing
+server:
+	@echo "  > Starting API server on port 8080"
+	@go run . --server --port=:8080
+
+load-test:
+	@echo "  > Running K6 load test"
+	@k6 run load_test.js

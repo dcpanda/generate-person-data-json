@@ -75,10 +75,28 @@ curl http://localhost:8080/health
 curl http://localhost:8080/api/persons?n=20
 ```
 
+## Load Testing
+The project includes load testing capabilities using the K6 open source load testing tool.
+
+1. Install K6 by following the [official installation guide](https://k6.io/docs/getting-started/installation/)
+
+2. Start the server in one terminal:
+```bash
+make server
+```
+
+3. Run the load test in another terminal:
+```bash
+make load-test
+```
+
+For more detailed information about the load testing setup, scenarios, and how to interpret results, see the [Load Testing README](Load_Test_README.md).
+
 ## TODO
 - [x] Refactor the code and see if we can make use of some other features of `gofakeit`
 - [x] Go `struct` is powerful and can include additional tags to reduce the boilerplate codes.
-- [ ] Add Unit Testing 
+- [x] Add Unit Testing 
+- [x] Add Load Testing with K6
 - [ ] Add more API endpoints for specific data generation needs
 - [ ] Implement rate limiting for the API
 - [ ] Add authentication for the API
