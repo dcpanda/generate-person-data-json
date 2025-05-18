@@ -8,7 +8,9 @@ import (
 	"time"
 )
 
-// Person represents a person with various attributes
+// Person represents a person with various attributes.
+// There is gofakeit struct. See https://github.com/brianvoe/gofakeit?tab=readme-ov-file#struct
+// I have seen the more complex the data generation, the fake tag becomes more difficult to use.
 type Person struct {
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`
