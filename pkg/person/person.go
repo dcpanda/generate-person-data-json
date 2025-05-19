@@ -8,22 +8,28 @@ import (
 	"time"
 )
 
+// PhoneInfo represents a phone number with additional metadata
+type PhoneInfo struct {
+	Number       string `json:"number"`
+	AllowedToSMS bool   `json:"allowed_to_sms,omitempty"`
+}
+
 // Person represents a person with various attributes.
 // There is gofakeit struct. See https://github.com/brianvoe/gofakeit?tab=readme-ov-file#struct
 // I have seen the more complex the data generation, the fake tag becomes more difficult to use.
 type Person struct {
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`
-	Gender       string `json:"gender"`
-	AddressLine1 string `json:"address_line_1"`
-	AddressLine2 string `json:"address_line_2"`
-	City         string `json:"city"`
-	State        string `json:"state_code"`
-	ZipCode      string `json:"zip_code"`
-	Phone        string `json:"phone"`
-	Email        string `json:"email"`
-	Birthday     string `json:"birthday"`
-	Age          int    `json:"age"`
+	FirstName    string               `json:"first_name"`
+	LastName     string               `json:"last_name"`
+	Gender       string               `json:"gender"`
+	AddressLine1 string               `json:"address_line_1"`
+	AddressLine2 string               `json:"address_line_2"`
+	City         string               `json:"city"`
+	State        string               `json:"state_code"`
+	ZipCode      string               `json:"zip_code"`
+	Phones       map[string]PhoneInfo `json:"phones"`
+	Email        string               `json:"email"`
+	Birthday     string               `json:"birthday"`
+	Age          int                  `json:"age"`
 }
 
 // CalculateAge calculates a person's age based on their birthday
@@ -48,6 +54,47 @@ func GeneratePerson() (Person, error) {
 		return Person{}, err
 	}
 
+	phones := make(map[string]PhoneInfo)
+
+	phoneTypes := []string{"Cell", "Work", "Home"}
+
+	// Randomly decide how many phone types this person will have (1, 2, or 3)
+	numPhoneTypes := gofakeit.Number(1, 3)
+
+	// Randomly decide if all phone numbers should be the same
+	useSameNumber := gofakeit.Bool() && numPhoneTypes > 1
+
+	// Generate a common phone number if needed
+	commonPhoneNumber := ""
+	if useSameNumber {
+		commonPhoneNumber = gofakeit.Phone()
+	}
+
+	gofakeit.ShuffleStrings(phoneTypes)
+
+	for i := 0; i < numPhoneTypes; i++ {
+		phoneType := phoneTypes[i]
+		phoneNumber := ""
+
+		if useSameNumber {
+			phoneNumber = commonPhoneNumber
+		} else {
+			phoneNumber = gofakeit.Phone()
+		}
+
+		// Only Cell Phone Type has Allowed SMS Flag
+		if phoneType == "Cell" {
+			phones[phoneType] = PhoneInfo{
+				Number:       phoneNumber,
+				AllowedToSMS: gofakeit.Bool(), // Randomly set SMS permission for cell phones
+			}
+		} else {
+			phones[phoneType] = PhoneInfo{
+				Number: phoneNumber,
+			}
+		}
+	}
+
 	person := Person{
 		FirstName:    gofakeit.FirstName(),
 		LastName:     gofakeit.LastName(),
@@ -57,7 +104,7 @@ func GeneratePerson() (Person, error) {
 		City:         address.City,
 		State:        gofakeit.StateAbr(),
 		ZipCode:      address.Zip,
-		Phone:        gofakeit.Phone(),
+		Phones:       phones,
 		Email:        gofakeit.Email(),
 		Birthday:     birthdate,
 		Age:          age,
