@@ -83,8 +83,20 @@ func TestGeneratePerson(t *testing.T) {
 	if person.ZipCode == "" {
 		t.Error("GeneratePerson() ZipCode is empty")
 	}
-	if person.Phone == "" {
-		t.Error("GeneratePerson() Phone is empty")
+	// Check that at least one phone type exists
+	if len(person.Phones) == 0 {
+		t.Error("GeneratePerson() Phones map is empty")
+	}
+
+	for phoneType, phone := range person.Phones {
+		if phone.Number == "" {
+			t.Errorf("GeneratePerson() Phones[%s].Number is empty", phoneType)
+		}
+	}
+
+	if cellPhone, exists := person.Phones["Cell"]; exists {
+		// The field will be either true or false
+		_ = cellPhone.AllowedToSMS
 	}
 	if person.Email == "" {
 		t.Error("GeneratePerson() Email is empty")
@@ -139,6 +151,19 @@ func TestGeneratePersonRecords(t *testing.T) {
 
 func TestMarshalToJSON(t *testing.T) {
 
+	// Create a map for different phone types
+	phones := make(map[string]PhoneInfo)
+	phones["Cell"] = PhoneInfo{
+		Number:       "555-123-4007",
+		AllowedToSMS: true,
+	}
+	phones["Work"] = PhoneInfo{
+		Number: "555-123-4008",
+	}
+	phones["Home"] = PhoneInfo{
+		Number: "555-123-4009",
+	}
+
 	person := Person{
 		FirstName:    "James",
 		LastName:     "Bond",
@@ -148,7 +173,7 @@ func TestMarshalToJSON(t *testing.T) {
 		City:         "Anytown",
 		State:        "CA",
 		ZipCode:      "12345",
-		Phone:        "555-123-4007",
+		Phones:       phones,
 		Email:        "james.bond@mi5.com",
 		Birthday:     "1990-01-01",
 		Age:          33,
