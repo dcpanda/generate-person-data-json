@@ -51,3 +51,16 @@ server:
 load-test:
 	@echo "  > Running K6 load test"
 	@k6 run load_test.js
+
+# Docker commands
+docker-build:
+	@echo "  > Building Docker image. See Dockerfile"
+	@docker build -t generate-person-data-json .
+
+docker-run-server:
+	@echo "  > Running Docker container in server mode"
+	@docker run -p 8080:8080 generate-person-data-json
+
+docker-run-generate:
+	@echo "  > Running Docker container to generate data"
+	@docker run -v $$(pwd):/output generate-person-data-json --server=false -o /output/fake_pii_data.json

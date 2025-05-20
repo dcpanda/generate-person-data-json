@@ -37,6 +37,57 @@ go run generate_json.go -o custom_output.json
 go run generate_json.go -h 
 ```
 
+## Running with Docker
+You can also run the application using Docker. You will need Docker or Podman.
+Podman is a drop-in replacement for Docker. 
+
+### Using Docker commands directly
+
+1. Build the Docker image:
+```bash
+docker build -t generate-person-data-json .
+```
+
+2. Run the container in server mode (default):
+```bash
+docker run -p 8080:8080 generate-person-data-json
+```
+
+3. Run the container to generate JSON data:
+```bash
+# Generate data with default settings (100 records to fake_pii_data.json)
+docker run -v $(pwd):/output generate-person-data-json --server=false
+
+# Generate custom number of records with custom filename
+docker run -v $(pwd):/output generate-person-data-json --server=false -n 500 -o /output/my_data.json
+
+# Show help
+docker run generate-person-data-json -h
+```
+
+Note: When generating files, you need to mount a volume to access the generated files from your host system.
+
+### Using Makefile commands
+
+The project includes Makefile commands for Docker operations:
+
+## Building the Docker image and runtime
+
+1. Build the Docker image:
+```bash
+make docker-build
+```
+
+2. Run the container in server mode:
+```bash
+make docker-run-server
+```
+
+3. Run the container to generate data:
+```bash
+make docker-run-generate
+```
+
 ## Building the module
 1. First build the executable
 ```bash
@@ -97,6 +148,7 @@ For more detailed information about the load testing setup, scenarios, and how t
 - [x] Go `struct` is powerful and can include additional tags to reduce the boilerplate codes.
 - [x] Add Unit Testing 
 - [x] Add Load Testing with K6
+- [x] Add Dockerfile
 - [ ] Add more API endpoints for specific data generation needs
 - [ ] Implement rate limiting for the API
 - [ ] Add authentication for the API
