@@ -3,15 +3,16 @@ package person
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/brianvoe/gofakeit/v7"
 	"math"
 	"time"
+
+	"github.com/brianvoe/gofakeit/v7"
 )
 
 // PhoneInfo represents a phone number with additional metadata
 type PhoneInfo struct {
 	Number       string `json:"number"`
-	AllowedToSMS bool   `json:"allowed_to_sms,omitempty"`
+	AllowedToSMS bool   `json:"allowed_to_sms,omitzero"`
 }
 
 // Person represents a person with various attributes.
@@ -72,7 +73,7 @@ func GeneratePerson() (Person, error) {
 
 	gofakeit.ShuffleStrings(phoneTypes)
 
-	for i := 0; i < numPhoneTypes; i++ {
+	for i := range numPhoneTypes {
 		phoneType := phoneTypes[i]
 		phoneNumber := ""
 
@@ -116,7 +117,7 @@ func GeneratePerson() (Person, error) {
 // GeneratePersonRecords generates a specified number of fake person records
 func GeneratePersonRecords(numRecords int) ([]Person, error) {
 	var personRecords []Person
-	for i := 0; i < numRecords; i++ {
+	for range numRecords {
 		person, err := GeneratePerson()
 		if err != nil {
 			return nil, fmt.Errorf("error generating person record: %w", err)
